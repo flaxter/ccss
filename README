@@ -1,0 +1,3 @@
+Instructions:
+
+python example.py --input input.csv --output results.csv --predict GRAF
