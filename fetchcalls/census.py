@@ -1,14 +1,14 @@
 from lxml import etree
 import shapely
 import re
-tree = etree.parse(open("censustracts2010.kml","r"))
+tree = etree.parse(open("../censustracts2010.kml","r"))
 
 from shapely.geometry import Point, Polygon
 def topoint(s):
     return (float(s[0]),float(s[1]))
 
 
-context = etree.iterparse(open("censustracts2010.kml","r"))
+context = etree.iterparse(open("../censustracts2010.kml","r"))
 id = ''
 tracts = {}
 tracts_to_area = {}
