@@ -1,4 +1,5 @@
 import os
+import sys
 
 data = {
 "vacant": "7nii-7srd",
@@ -20,7 +21,7 @@ if len(sys.argv) < 2:
     print "usage: %s output.csv"%sys.argv[0]
     sys.exit()
 
-for name in data.keys():
+for name in data.keys()[0:1]:
     s("wget http://data.cityofchicago.org/api/views/%s/rows.csv?accessType=DOWNLOAD"%data[name])
     s("mv rows.csv* %s.csv"%name)
 
@@ -42,6 +43,7 @@ delete_row("vacant")
 streams = [ "vacant-fixed", "sanitation", "tree", "potholes", "rodent", "grafitti", "lights", "garbagecarts-fixed"]
 
 import csv
+from pandas import *
 first = True
 for name in streams:
     d = read_csv("%s.csv"%name,parse_dates=True)
