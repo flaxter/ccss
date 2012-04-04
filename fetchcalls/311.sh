@@ -5,5 +5,5 @@ python fetch.py 311.csv
 
 # geocode 311.csv
 python geocode.py 311.csv > 311-geocoded.csv
-python postprocess.py 311-geocoded.csv > 311-census-violent.csv
+python postprocess.py 311-geocoded.csv > 311-census.csv
 
