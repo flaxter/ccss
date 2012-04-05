@@ -53,9 +53,13 @@ import csv
 from pandas import *
 first = True
 for name in streams:
-    d = read_csv("%s.csv"%name,parse_dates=True)
-    d = d.rename(columns={"Creation Date":"date", "CREATION DATE":"date","DATE SERVICE REQUEST WAS RECEIVED":"date", "IS THE BUILDING CURRENTLY VACANT OR OCCUPIED?":"type","LATITUDE":"latitude","LONGITUDE":"longitude","TYPE OF SERVICE REQUEST":"type","Type of Service Request":"type","Latitude":"latitude","Longitude":"longitude"})
-    d.to_csv(sys.argv[1],mode="a",cols=['date','type','latitude','longitude'],index=False,header=first)
-    first = False
+    try:
+        d = read_csv("%s.csv"%name,parse_dates=True)
+        d = d.rename(columns={"Creation Date":"date", "CREATION DATE":"date","DATE SERVICE REQUEST WAS RECEIVED":"date", "IS THE BUILDING CURRENTLY VACANT OR OCCUPIED?":"type","LATITUDE":"latitude","LONGITUDE":"longitude","TYPE OF SERVICE REQUEST":"type","Type of Service Request":"type","Latitude":"latitude","Longitude":"longitude"})
+        d.to_csv(sys.argv[1],mode="a",cols=['date','type','latitude','longitude'],index=False,header=first)
+        first = False
+    except:
+        print "failed on", name
+        pass
 
 
