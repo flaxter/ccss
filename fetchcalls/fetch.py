@@ -36,8 +36,15 @@ def delete_row(filename):
     f.close()
     f2.close()
 
-delete_row("garbagecarts")
-delete_row("vacant")
+try:
+    delete_row("garbagecarts")
+except:
+    print "failed to fix garbagecarts.csv"
+
+try:
+    delete_row("vacant")
+except:
+    print "failed to fix vacant.csv"
 #delete_row("all-crime")
 
 streams = [ "vacant-fixed", "sanitation", "tree", "potholes", "rodent", "grafitti", "lights", "garbagecarts-fixed"]
