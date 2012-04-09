@@ -37,8 +37,15 @@ def delete_row(filename):
     f.close()
     f2.close()
 
-delete_row("garbagecarts")
-delete_row("vacant")
+try:
+    delete_row("garbagecarts")
+except:
+    print "failed to fix garbagecarts.csv"
+
+try:
+    delete_row("vacant")
+except:
+    print "failed to fix vacant.csv"
 #delete_row("all-crime")
 
 streams = [ "vacant-fixed", "sanitation", "tree_debris","tree_trims", "potholes", "rodent", "grafitti", "lights", "garbagecarts-fixed"]
@@ -47,9 +54,13 @@ import csv
 from pandas import *
 first = True
 for name in streams:
-    d = read_csv("%s.csv"%name,parse_dates=True)
-    d = d.rename(columns={"Creation Date":"date", "CREATION DATE":"date","DATE SERVICE REQUEST WAS RECEIVED":"date", "IS THE BUILDING CURRENTLY VACANT OR OCCUPIED?":"type","LATITUDE":"latitude","LONGITUDE":"longitude","TYPE OF SERVICE REQUEST":"type","Type of Service Request":"type","Latitude":"latitude","Longitude":"longitude"})
-    d.to_csv(sys.argv[1],mode="a",cols=['date','type','latitude','longitude'],index=False,header=first)
-    first = False
+    try:
+        d = read_csv("%s.csv"%name,parse_dates=True)
+        d = d.rename(columns={"Creation Date":"date", "CREATION DATE":"date","DATE SERVICE REQUEST WAS RECEIVED":"date", "IS THE BUILDING CURRENTLY VACANT OR OCCUPIED?":"type","LATITUDE":"latitude","LONGITUDE":"longitude","TYPE OF SERVICE REQUEST":"type","Type of Service Request":"type","Latitude":"latitude","Longitude":"longitude"})
+        d.to_csv(sys.argv[1],mode="a",cols=['date','type','latitude','longitude'],index=False,header=first)
+        first = False
+    except:
+        print "failed on", name
+        pass
 
 
