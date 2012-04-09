@@ -1,4 +1,3 @@
 Instructions:
 
-python example.py --input input.csv --output results.csv --predict GRAF
-python example2.py --input input.csv --output results.csv --predict GRAF
+python example2.py --input input/sample.csv --output results.csv --predict "pot hole in street"
