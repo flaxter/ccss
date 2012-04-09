@@ -19,7 +19,7 @@ def match_tract(lat,long,tracts=tracts):
         if tracts[t].contains(Point(long,lat)):
             return t
     else:
-        return 'did not match'
+        return 'did not match' # TODO: how often and why?
 
 cols = data.next()
 date_i = cols.index('date')

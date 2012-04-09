@@ -18,8 +18,8 @@ cols = data.next()
 print ",".join(cols)
 types = set([])
 old = ''
-s1 = [ "vacant", "sanitation", "tree", "potholes", "rodent", "graffiti", "lights", "garbagecarts", "lights"]
-s2 = [s.lower() for s in ['Vacant', 'Sanitation Code Violation', 'Tree Debris', 'Pot Hole in Street', 'Rodent Baiting/Rat Complaint', 'Graffiti Removal', 'Street Light - All/Out', 'Garbage Cart Black Maintenance', 'Street Lights - All/Out']]
+s1 = [ "vacant", "sanitation", "tree_debris","tree_trims", "potholes", "rodent", "graffiti", "lights", "garbagecarts", "lights"]
+s2 = [s.lower() for s in ['Vacant', 'Sanitation Code Violation', 'Tree Debris',"Tree Trim", 'Pot Hole in Street', 'Rodent Baiting/Rat Complaint', 'Graffiti Removal', 'Street Light - All/Out', 'Garbage Cart Black Maintenance', 'Street Lights - All/Out']]
 
 streams = dict(zip(s2,s1))
 dates = {}

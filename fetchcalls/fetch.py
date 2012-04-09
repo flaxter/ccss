@@ -4,7 +4,8 @@ import sys
 data = {
 "vacant": "7nii-7srd",
 "sanitation": "me59-5fac",
-"tree": "mab8-y9h3",
+"tree_debris": "mab8-y9h3", # tree debris
+"tree_trims":"uxic-zsuj",			# todo: need to add tree-trim 
 "potholes": "7as2-ds3y",
 "rodent": "97t6-zrhs",
 "grafitti": "hec5-y4x5",
@@ -21,7 +22,7 @@ if len(sys.argv) < 2:
     print "usage: %s output.csv"%sys.argv[0]
     sys.exit()
 
-for name in data.keys()[0:1]:
+for name in data.keys():
     s("wget http://data.cityofchicago.org/api/views/%s/rows.csv?accessType=DOWNLOAD"%data[name])
     s("mv rows.csv* %s.csv"%name)
 
@@ -47,7 +48,7 @@ except:
     print "failed to fix vacant.csv"
 #delete_row("all-crime")
 
-streams = [ "vacant-fixed", "sanitation", "tree", "potholes", "rodent", "grafitti", "lights", "garbagecarts-fixed"]
+streams = [ "vacant-fixed", "sanitation", "tree_debris","tree_trims", "potholes", "rodent", "grafitti", "lights", "garbagecarts-fixed"]
 
 import csv
 from pandas import *
