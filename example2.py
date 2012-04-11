@@ -1,5 +1,5 @@
 from ccss import *
-from fullsearch import search
+from iterative_search import search
 
 print "precalculating centers of all tracts (this may take a little while)"
 with mytimer:
