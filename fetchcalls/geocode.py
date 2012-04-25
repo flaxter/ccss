@@ -14,17 +14,28 @@ if len(sys.argv) < 2:
 
 data = csv.reader(open(sys.argv[1],"r"))
 
+tract_hash = {}
+
 def match_tract(lat,long,tracts=tracts):
+    if (lat,long) in tract_hash:
+        return tract_hash[(lat,long)]
     for t in tracts.keys():
         if tracts[t].contains(Point(long,lat)):
+            tract_hash[(lat,long)] = t
             return t
     else:
         return 'did not match' # TODO: how often and why?
 
 cols = data.next()
 date_i = cols.index('date')
-lat_i = cols.index('latitude')
-long_i = cols.index('longitude')
+try:
+    lat_i = cols.index('lat')
+except:
+    lat_i = cols.index('latitude')
+try:
+    long_i = cols.index('long')
+except:
+    long_i = cols.index('longitude')
 cat_i = cols.index('type')
 
 print "date,type,area,tract,lat,long"
