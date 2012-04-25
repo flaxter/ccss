@@ -12,9 +12,9 @@ def topoint(s):
 
 
 try:
-    context = etree.parse(open("../censustracts2010.kml","r"))
+    context = etree.iterparse(open("../censustracts2010.kml","r"))
 except:
-    context = etree.parse(open("censustracts2010.kml","r"))
+    context = etree.iterparse(open("censustracts2010.kml","r"))
 id = ''
 tracts = {}
 tracts_to_area = {}
