@@ -20,13 +20,19 @@ def match_block(lat,long,blocks=blocks):
         if blocks[t].contains(Point(long,lat)):
             return t
     else:
-        print 'does not match'
+        #print 'does not match'
         return -1
 
 cols = data.next()
 date_i = cols.index('date')
-lat_i = cols.index('latitude')
-long_i = cols.index('longitude')
+try:
+    lat_i = cols.index('lat')
+except:
+    lat_i = cols.index('latitude')
+try:
+    long_i = cols.index('long')
+except:
+    long_i = cols.index('longitude')
 cat_i = cols.index('type')
 
 print "date,type,block"
@@ -43,8 +49,8 @@ for row in data:
         if cat != '' and date != '':
             try:
                 block = match_block(lat,long)
-                #if(not block == 'did not match'): 
-                print "%s,%s,%s"%(date,cat.lower(),block)
+                if(not block == -1): 
+                    print "%s,%s,%s"%(date,cat.lower(),block)
             except:
                 #print "didn't match", row
                 pass
