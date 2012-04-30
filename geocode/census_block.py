@@ -11,7 +11,6 @@ def topoint(s):
 context = etree.iterparse(open("../censusblocks2010.kml","r"))
 id = ''
 blocks = {}
-#tracts_to_area = {}
 
 block_re = r'TRACT_BLOCK</td>\r\r\n<td>([0-9]+)'
 
@@ -33,7 +32,13 @@ for action, e in context:
 	#if(count  < 2):
 		#print block,blocks[block]
 	
-	
-        
-	
+# generate block_to_coords.csv
+if __name__ == "__main__":
+    f = open("blocks_to_coords.csv","w")
+    print >>f, "block,lat,long"
+    for id in blocks.keys():
+        long, lat = blocks[id].centroid.x, blocks[id].centroid.y
+        print >>f, "%s,%f,%f"%(id, lat, long)
+
+    f.close()
 
