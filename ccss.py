@@ -50,6 +50,9 @@ n_streams = len(streams)
 def time_series(x,period=period,print_nonzero=False,lag=0,max_lag=MAX_LAG):
     r =  x['date'].groupby(x['date']).count().reindex(daterange).fillna(0) #.to_sparse()
 
+    def rolling_mean(x,n):
+        return x #stats.moments.ewma(x,span=n)
+
     if lag > 0:
         t = rolling_mean(r,7).shift(-1 * lag)[6:-1 * max_lag]
     else:
@@ -57,6 +60,7 @@ def time_series(x,period=period,print_nonzero=False,lag=0,max_lag=MAX_LAG):
 
     t = t.diff(7)[7:]
 
+    #return t
     return t - t.mean()
 
 ## SEARCH FUNCTIONS
