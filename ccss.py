@@ -394,67 +394,51 @@ def spatial_search(input, stream_s, tracts_bestguess, X_ts_precalculated=None, Y
 
     return sorted(approx_best), best, time_series(X[X.tract.isin(approx_best)]), time_series(Y[Y.tract.isin(approx_best)],lag=Y_LAG), X_ts_precalculated, Y_ts_precalculated, X_tssq_precalculated, Y_tssq_precalculated 
 
+def greedy_search(data, streams=streams):
+    tracts= unique(data['tract'])
+    Dopt = np.array([])
+    Sopt = np.array([])
+    beta = -1
+    total_iters = 0
 
-def greedy_simultaneous(region,streams):
-    tracts = unique(region['tract'])
-    n_tracts = len(tracts)
+    for k in range(opts.restarts):
+        #        print "restart #%d"%k
+        best_D = random_subset(streams)
+        best_S = tracts
+        finished = 0
+        i = 0
 
-    Xdata = region[match_streams(region, streams)]
-    Ydata = region[match_streams(region, [opts.predict])]
+        best_cor = -1
 
-    X_ts = {}
-    n_streams = len(streams)
+        while(finished < 2 and i < 20):
+            finished = 0
+            i += 1
+          
+            cor, S = greedy_spatial(data, best_D)
 
-    for i in range(n_streams):
-        Xdata = region[region['type'] == streams[i]]
-        for j in range(n_tracts):
-            X_ts[(i,j)] = time_series(Xdata[Xdata['tract'] == tracts[j]])
-            Y_ts[(i,j)] = time_series(Ydata[Ydata['tract'] == tracts[j]])
+            if cor > best_cor:
+                best_S = S
+                best_cor = cor
+            else:
+                finished = 1
 
-    S = []
-    D = []
-    Sopt = []
-    Dopt = []
-    X = np.zeros(len(X_ts[(0,0)]))
-    Y = np.zeros(len(X_ts[(0,0)]))
-    ropt = 0
+            region = data[match_tracts(data,best_S)] 
+            cor, D = greedy_streams(region,np.array(streams))
 
-    for ii in range(n_streams * n_tracts):
-        r = np.zeros(n_tracts)
-        for j in range(n_tracts):
-            if not j in S:
-                r[j] = (Y + Y_ts[j]).corr(X + X_ts[j])  # change this...
+            if cor > best_cor:
+                best_D = D
+                best_cor = cor
+            else:
+                finished += 1
 
-        r[np.isnan(r)] = 0
+        total_iters += i
 
-        max_i = np.argmax(r)
-        X += X_ts[max_i]
-        Y += Y_ts[max_i]
-        S.append(max_i)
-        rstar = np.max(r)
-        print "%d: r = %f, ropt = %f"%(ii,rstar,ropt)
-        if rstar > ropt:
-            ropt = rstar
-            Sopt = list(S)
+        if best_cor > beta:
+            beta = best_cor
+            Dopt = best_D
+            Sopt = best_S
 
-        r = r * 0
-        for j in range(n_streams):
-            if not j in D:
-                r[j] = Y.corr(X + X_ts[j]) 
-
-        r[np.isnan(r)] = 0
-
-        max_i = np.argmax(r)
-        X += X_ts[max_i]
-        Y += Y_ts[max_i]
-        S.append(max_i)
-        rstar = np.max(r)
-        print "%d: r = %f, ropt = %f"%(ii,rstar,ropt)
-        if rstar > ropt:
-            ropt = rstar
-            Sopt = list(S)
-
-    rtest = time_series(Xdata[match_tracts(Xdata,tracts[Sopt])]).corr(time_series(Ydata[match_tracts(Ydata,tracts[Sopt])],lag=Y_LAG))
+    return beta, list(Sopt), list(Dopt), (total_iters + 0.0) / opts.restarts
 
 def greedy_streams(region,streams=streams):
     # calculate dependent variable in this region
@@ -502,7 +486,7 @@ def greedy_streams(region,streams=streams):
 #    assert((ropt - rtest) < .00001)
     return ropt, list(streams[Dopt])
 
-def greedy_spatial(region,streams):
+def greedy_locations(region,streams):
     tracts = unique(region['tract'])
     n_tracts = len(tracts)
 
