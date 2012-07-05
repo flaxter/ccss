@@ -394,3 +394,152 @@ def spatial_search(input, stream_s, tracts_bestguess, X_ts_precalculated=None, Y
 
     return sorted(approx_best), best, time_series(X[X.tract.isin(approx_best)]), time_series(Y[Y.tract.isin(approx_best)],lag=Y_LAG), X_ts_precalculated, Y_ts_precalculated, X_tssq_precalculated, Y_tssq_precalculated 
 
+
+def greedy_simultaneous(region,streams):
+    tracts = unique(region['tract'])
+    n_tracts = len(tracts)
+
+    Xdata = region[match_streams(region, streams)]
+    Ydata = region[match_streams(region, [opts.predict])]
+
+    X_ts = {}
+    n_streams = len(streams)
+
+    for i in range(n_streams):
+        Xdata = region[region['type'] == streams[i]]
+        for j in range(n_tracts):
+            X_ts[(i,j)] = time_series(Xdata[Xdata['tract'] == tracts[j]])
+            Y_ts[(i,j)] = time_series(Ydata[Ydata['tract'] == tracts[j]])
+
+    S = []
+    D = []
+    Sopt = []
+    Dopt = []
+    X = np.zeros(len(X_ts[(0,0)]))
+    Y = np.zeros(len(X_ts[(0,0)]))
+    ropt = 0
+
+    for ii in range(n_streams * n_tracts):
+        r = np.zeros(n_tracts)
+        for j in range(n_tracts):
+            if not j in S:
+                r[j] = (Y + Y_ts[j]).corr(X + X_ts[j])  # change this...
+
+        r[np.isnan(r)] = 0
+
+        max_i = np.argmax(r)
+        X += X_ts[max_i]
+        Y += Y_ts[max_i]
+        S.append(max_i)
+        rstar = np.max(r)
+        print "%d: r = %f, ropt = %f"%(ii,rstar,ropt)
+        if rstar > ropt:
+            ropt = rstar
+            Sopt = list(S)
+
+        r = r * 0
+        for j in range(n_streams):
+            if not j in D:
+                r[j] = Y.corr(X + X_ts[j]) 
+
+        r[np.isnan(r)] = 0
+
+        max_i = np.argmax(r)
+        X += X_ts[max_i]
+        Y += Y_ts[max_i]
+        S.append(max_i)
+        rstar = np.max(r)
+        print "%d: r = %f, ropt = %f"%(ii,rstar,ropt)
+        if rstar > ropt:
+            ropt = rstar
+            Sopt = list(S)
+
+    rtest = time_series(Xdata[match_tracts(Xdata,tracts[Sopt])]).corr(time_series(Ydata[match_tracts(Ydata,tracts[Sopt])],lag=Y_LAG))
+
+def greedy_streams(region,streams=streams):
+    # calculate dependent variable in this region
+    Y = time_series(region[region['type'] == opts.predict],lag=Y_LAG) 
+    
+    X_ts = {}
+    n_streams = len(streams)
+
+    for i in range(n_streams):
+        try:
+            X_ts[i] = time_series(region[region['type'] == streams[i]])
+        except:
+            X_ts[i] = Y * 0
+
+    D = []
+    Dopt = []
+    X = np.zeros(len(Y))
+    ropt = 0
+    monotonic = True
+    last_best = -1
+
+    for ii in range(n_streams):
+        r = np.zeros(n_streams)
+        for j in range(n_streams):
+            if not j in D:
+                r[j] = Y.corr(X + X_ts[j]) 
+                if ii == 0:
+                    print "Y vs %s: %f"%(streams[j],r[j])
+
+        r[np.isnan(r)] = 0
+
+        max_i = np.argmax(r)
+        X += X_ts[max_i]
+        D.append(max_i)
+        rstar = np.max(r)
+        print "%d: r = %f, ropt = %f (%s)"%(ii,rstar,ropt,str(monotonic))
+        if rstar > ropt:
+            ropt = rstar
+            Dopt = list(D)
+#            if last_best != (ii - 1) and last_best != -1:
+#                monotonic = False
+            last_best = ii
+
+    rtest = time_series(region[match_streams(region,streams[Dopt])]).corr(Y)
+#    assert((ropt - rtest) < .00001)
+    return ropt, list(streams[Dopt])
+
+def greedy_spatial(region,streams):
+    tracts = unique(region['tract'])
+    n_tracts = len(tracts)
+
+    Xdata = region[match_streams(region, streams)]
+    Ydata = region[match_streams(region, [opts.predict])]
+
+    X_ts = {}
+    Y_ts = {}
+
+    for i in range(n_tracts):
+        X_ts[i] = time_series(Xdata[Xdata['tract'] == tracts[i]])
+        Y_ts[i] = time_series(Ydata[Ydata['tract'] == tracts[i]],lag=Y_LAG)
+
+    S = []
+    Sopt = []
+    X = np.zeros(len(X_ts[0]))
+    Y = np.zeros(len(X_ts[0]))
+    ropt = 0
+
+    for ii in range(n_tracts):
+        r = np.zeros(n_tracts)
+        for j in range(n_tracts):
+            if not j in S:
+                r[j] = (Y + Y_ts[j]).corr(X + X_ts[j]) 
+
+        r[np.isnan(r)] = 0
+
+        max_i = np.argmax(r)
+        X += X_ts[max_i]
+        Y += Y_ts[max_i]
+        S.append(max_i)
+        rstar = np.max(r)
+        print "%d: r = %f, ropt = %f"%(ii,rstar,ropt)
+        if rstar > ropt:
+            ropt = rstar
+            Sopt = list(S)
+
+    rtest = time_series(Xdata[match_tracts(Xdata,tracts[Sopt])]).corr(time_series(Ydata[match_tracts(Ydata,tracts[Sopt])],lag=Y_LAG))
+    #assert((ropt - rtest) < .00001)
+    return ropt, list(tracts[Sopt])
