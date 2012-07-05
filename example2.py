@@ -1,5 +1,5 @@
 from ccss import *
-from iterative_search import search
+from ccss import greedy_search as search
 
 print "precalculating centers of all tracts (this may take a little while)"
 with mytimer:
@@ -7,12 +7,14 @@ with mytimer:
 
 print "completed in %d seconds"%mytimer.elapsed
 
-out = csv.writer(open(opts.output,"w"))
-out.writerow("tract R Dopt Sopt Xn Yn elapsed".split())
+f = open(opts.output,"w")
+out = csv.writer(f)
+out.writerow("predict tract R Dopt Sopt Xn Yn elapsed".split())
 
 radius = .01
 
-for tract in np.unique(input['tract']):
+n_tracts = len(np.unique(input['tract'])) * 1.0
+for i, tract in enumerate(np.unique(input['tract'])):
     data = input[match_tracts(input, nearby_tracts(tract_centers[tract],input,radius))]
     with mytimer:
         R, Sopt, Dopt, iters = search(data, np.array(streams))
@@ -24,7 +26,9 @@ for tract in np.unique(input['tract']):
     print "for predicting", opts.predict, "with these leading indicators:", ' '.join(Dopt)
     print "# of events in X:", Xn
     print "# of events in Y:", Yn
-    if np.abs(R) > .4:
-        out.writerow([tract, R, Dopt, Sopt, Xn, Yn, mytimer.elapsed])
+    if np.abs(R) > .3:
+        out.writerow([opts.predict, tract, R, Dopt, Sopt, Xn, Yn, mytimer.elapsed])
+    f.flush()
+    print "%d %% done", i / n_tracts
 
 print "search complete, output written to %s"%(opts.output)
