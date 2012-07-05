@@ -414,7 +414,7 @@ def greedy_search(data, streams=streams):
             finished = 0
             i += 1
           
-            cor, S = greedy_spatial(data, best_D)
+            cor, S = greedy_locations(data, best_D)
 
             if cor > best_cor:
                 best_S = S
