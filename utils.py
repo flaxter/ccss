@@ -1,3 +1,4 @@
+import csv
 import pylab as pl
 import dateutil
 import cPickle as pickle
@@ -115,7 +116,7 @@ def parse_args():
     parser.add_option("-t", "--tracts", dest="tracts", help="restrict data to which tracts? (put a list in quotes)", default="all")
     parser.add_option("--test", dest="test", help="script specific", default="")
     parser.add_option("--noniterative", dest="iterative", help="for ADP-iterative or not?", default=True, action="store_false")
-    parser.add_option("--restarts", dest="restarts", help="number of random restarts", default=50, type=int)
+    parser.add_option("--restarts", dest="restarts", help="number of random restarts", default=10, type=int)
     parser.add_option("--image", dest="image", help="image output file for plotting", default="output.png")
     parser.add_option("--skip", dest="skip_filter", action="store_true", help="for debugging only", default=False)
     parser.add_option("--exhaustive", dest="exhaustive", help="pickled dict with exhaustive results, indexed by area", default='')
@@ -125,6 +126,8 @@ def parse_args():
     parser.add_option("--enddate", dest="end_date", help="MM/DD/YYYY", default='')
     parser.add_option("--lag", dest="lag", default=7, type=int)
     parser.add_option("--dpenalty", dest="dpenalty", default=0, type=float)
+    parser.add_option("--process", dest="process")
+    parser.add_option("--row", dest="row", type=int)
 
     opts = parser.parse_args()[0]
     if opts.start_date != '':
@@ -229,13 +232,18 @@ def nearby_tracts(coord, input, radius=.01):
     distances = np.sqrt((input['lat'] - lat) ** 2 + (input['long'] - long) ** 2)
     return np.array(np.unique(input[distances < radius]['tract']))
 
-def calculate_tract_centers(input):
+def calculate_tract_centers(input=0):
     tract_centers = {}
-
-    for t in np.unique(input['tract']):
-        x = input[input['tract'] == t]
-        lat = np.median(x['lat'])
-        long = np.median(x['long'])
-        tract_centers[t] = (lat,long)
-
+    c = csv.reader(open("geocode/tracts_to_coords.csv","r"))
+    col = c.next()
+    for row in c:
+        tract_centers[float(row[0])] = (float(row[1]),float(row[2]))
     return tract_centers
+
+   # for t in np.unique(input['tract']):
+   #     x = input[input['tract'] == t]
+   #     lat = np.median(x['lat'])
+   #     long = np.median(x['long'])
+   #     tract_centers[t] = (lat,long)
+#
+#    return tract_centers
