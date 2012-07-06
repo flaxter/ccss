@@ -1,8 +1,13 @@
-#### This code searches over subsets of streams and locations simultaneously
+# TODO: fix this...
+
+
+#### This code searches for an optimal subset of locations, aggregated over a fixed set of streams
 
 from ccss import *
-from ccss import greedy_search as search
+from ccss import greedy_locations as search_locations
 
+f = open(opts.output,"w")
+out = csv.writer(f)
 
 # Aggregate over these streams
 if opts.streams != "all":
@@ -23,19 +28,18 @@ elif opts.tracts != "all":
     matched = opts.tracts
 
 with mytimer:
-    R, Sopt, Dopt, iters = search(data, np.array(streams))
+    R, Sopt = search_locations(data, np.array(streams))
 
-Xn = np.sum(match_streams(data,Dopt) * match_tracts(data,Sopt))
+Xn = np.sum(match_tracts(data,Sopt))
 Yn = np.sum(match_streams(data,[opts.predict]) * match_tracts(data,Sopt))
-print "\n\n-------------------- In area", matched, "with streams", streams
+print "\n\n-------------------- In area", matched
 print "Correlation = %.05f"%R
-print "for predicting", opts.predict, "with these leading indicators:", ', '.join(Dopt)
+print "for predicting", opts.predict, "with these leading indicators:", ', '.join(streams)
+print "in these tracts", Sopt
 print "# of events in X:", Xn
 print "# of events in Y:", Yn
 
-f = open(opts.output,"w")
-out = csv.writer(f)
-out.writerow("predict streams region R Dopt Sopt Xn Yn elapsed".split())
-out.writerow([opts.predict, streams, matched, R, Dopt, Sopt, Xn, Yn, mytimer.elapsed])
+out.writerow("predict R D Sopt Xn Yn elapsed".split())
+out.writerow([opts.predict, R, streams, Sopt, Xn, Yn, mytimer.elapsed])
 
 print "search complete, output written to %s"%(opts.output)

@@ -32,6 +32,8 @@ else:
 
 period = (end_date - start_date).days + 1
 daterange = [start_date+td(day) for day in range(period)] 
+TIME_PERIOD_A = daterange[0:period/2]
+TIME_PERIOD_B = daterange[period/2:period]
 
 MAX_LAG = opts.lag
 Y_LAG = opts.lag
@@ -47,7 +49,7 @@ n_streams = len(streams)
 
 ## UTILITY FUNCTION
 
-def time_series(x,period=period,print_nonzero=False,lag=0,max_lag=MAX_LAG):
+def time_series(x,period=period,print_nonzero=False,lag=0,max_lag=MAX_LAG,daterange=daterange):
     r =  x['date'].groupby(x['date']).count().reindex(daterange).fillna(0) #.to_sparse()
 
     def rolling_mean(x,n):
@@ -465,8 +467,8 @@ def greedy_streams(region,streams=streams):
         for j in range(n_streams):
             if not j in D:
                 r[j] = Y.corr(X + X_ts[j]) 
-                if ii == 0:
-                    print "Y vs %s: %f"%(streams[j],r[j])
+#                if ii == 0:
+                    #                    print "Y vs %s: %f"%(streams[j],r[j])
 
         r[np.isnan(r)] = 0
 
@@ -474,7 +476,7 @@ def greedy_streams(region,streams=streams):
         X += X_ts[max_i]
         D.append(max_i)
         rstar = np.max(r)
-        print "%d: r = %f, ropt = %f (%s)"%(ii,rstar,ropt,str(monotonic))
+#        print "%d: r = %f, ropt = %f (%s)"%(ii,rstar,ropt,str(monotonic))
         if rstar > ropt:
             ropt = rstar
             Dopt = list(D)
@@ -519,7 +521,7 @@ def greedy_locations(region,streams):
         Y += Y_ts[max_i]
         S.append(max_i)
         rstar = np.max(r)
-        print "%d: r = %f, ropt = %f"%(ii,rstar,ropt)
+        #print "%d: r = %f, ropt = %f"%(ii,rstar,ropt)
         if rstar > ropt:
             ropt = rstar
             Sopt = list(S)

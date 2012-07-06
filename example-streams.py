@@ -2,9 +2,6 @@
 
 #### Ideas for exploratory data analysis: 
 #### 1. Try different sets of locations (very small vs. very large)
-#### 2. Leave out 50% of data (create a training dataset and a testing dataset), run this on
-####    the training data set and see whether any of the correlations you find are still significant
-####    for the test data set.
 
 from ccss import *
 from ccss import greedy_streams as search_streams

@@ -1,4 +1,69 @@
-Instructions:
+Let's consider Chicago's historic black belt, West Garfield Park, East 
+Garfield Park, North Lawndale, Near West Side, Near South Side, Douglas, 
+Oakland, Grand Boulevard, Washington Park, and Englewood (see William Julius 
+Wilson, When Work Disappears, p. 13). I found the corresponding community area numbers 
+here: http://en.wikipedia.org/wiki/Community_areas_in_Chicago
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                       EXAMPLE 1:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In these 10 neighborhoods, let's ask, which other types of calls predict calls about
+vacant and abandoned buildings? Here's the command to enter:
+
+python example-streams.py --area "[26,27,28,29,33,35,36,38,40,68]" --predict vacant --output results/black-belt-vacant.csv
+
+And here are the results I get... (I'd love to know what results you get with a larger dataset!)
+
+-------------------- In area [26.0, 27.0, 28.0, 29.0, 33.0, 35.0, 36.0, 38.0, 40.0, 68.0]
+Correlation = 0.13107
+for predicting vacant with these leading indicators: tree debris
+# of events in X: 1352
+# of events in Y: 2069
+search complete, output written to results/black-belt-vacant.csv
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                       EXAMPLE 2:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now let's ask, in which tracts of these neighborhoods does "tree debris" best predict vacant calls?
+
+python example-locations.py --area "[26,27,28,29,33,35,36,38,40,68]" --predict vacant --streams ["tree debris"] --output results/black-belt-vacant-tracts.csv
+
+Results:
+
+-------------------- In area [26.0, 27.0, 28.0, 29.0, 33.0, 35.0, 36.0, 38.0, 40.0, 68.0]
+Correlation = 0.63585
+for predicting vacant with these leading indicators: tree debris
+in these tracts [2808.0, 2804.0, 3510.0, 3515.0, 3805.0, 8329.0, 8333.0, 8381.0, 2809.0, 2828.0, 2819.0, 2838.0, 8436.0, 3511.0, 3802.0, 8414.0, 8371.0, 8410.0, 8358.0]
+# of events in X: 175
+# of events in Y: 72
+search complete, output written to results/default-output.csv
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                       EXAMPLE 3:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, what if we want to search over both tracts and streams simultaneously in these areas? This search takes
+awhile...
+
+python example-simultaneous.py --area "[26,27,28,29,33,35,36,38,40,68]" --predict vacant --output results/black-belt-vacant-simultaneous.csv
+
+Results:
+
+-------------------- In area [26.0, 27.0, 28.0, 29.0, 33.0, 35.0, 36.0, 38.0, 40.0, 68.0] with streams [garbage cart black maintenance graffiti removal occupied
+ pot hole in street rodent baiting/rat complaint sanitation code violation
+ street lights - all/out tree debris]
+Correlation = 0.52265
+for predicting vacant with these leading indicators: garbage cart black maintenance, graffiti removal, sanitation code violation
+# of events in X: 1888
+# of events in Y: 314
+search complete, output written to results/default-output.csv
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                            And some more examples of syntax
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 python example-streams.py --tracts "[8430.0, 8431.0, 8432.0, 8433.0, 8434.0, 8435.0, 8436.0, 8437.0, 8438.0]"
 python example-streams.py "pot hole in street" --area "[6]"
@@ -6,10 +71,9 @@ python example-streams.py "pot hole in street" --area "[6]"
 python example-locations.py --area "[34,35]" 
 python example-locations.py --predict vacant
 
-
 This one will take a long time to run; while it's running you can check
 the results by opening another terminal and looking at results/vacant.csv 
 (the -u option for python tells it to write results right away without 
 waiting until the program exits.)
 
-python -u example-simultaneous.py --predict vacant --output results/vacant.csv
+python -u example-centeredontracts.py --predict vacant --output results/vacant.csv
