@@ -62,6 +62,22 @@ search complete, output written to results/default-output.csv
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                       EXAMPLE 3:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+BONUS: now let's search over circles centered on each tract in the city, with radius .01 (this can be changed on line 3 of the
+code---it'd be great if you could mess around and figure out a reasonable search radius)
+For each circle, we'll look for a subset of tracts and streams where the correlation with vacant is high. 
+To try to raise the level of significance, we'll do the search with data from the first half of the year, then
+calculate the correlation for the second half of the year for the tracts/streams that were selected, and also for the
+entire year. These are reported as R (entire year), R_a (first half), and R_b (second half). 
+
+NB: this search takes awhile! Consider letting it run in the background while you do something else. If you use the "-u" option for
+python then you can take a look at the results in another Terminal window by typing "tail -f results/vacant-centeredontracts-sig.csv"
+
+python -u example-centeredontracts-sig.py --predict vacant --output results/vacant-centeredontracts-sig.csv
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             And some more examples of syntax
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
