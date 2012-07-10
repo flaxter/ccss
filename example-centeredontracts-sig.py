@@ -34,12 +34,14 @@ for i, tract in enumerate(np.unique(input['tract'])):
     R = X_ts.corr(Y_ts)
 
     print "\n\n-------------------- TRACT", tract
+    if R_a > .3 and R_b > .3 and R > .3:
+        print "\n\n!!!!!!!!!!!!!!!!!!!! Found a significant one?"
+
     print "Correlation = %.05f (%.05f for first half of year, %.05f for second half of year)"%(R,R_a,R_b)
     print "for predicting", opts.predict, "with these leading indicators:", ', '.join(Dopt)
     print "# of events in X:", Xn
     print "# of events in Y:", Yn
-    #if R_a > .3 and R_b > .3 and R > .3:
-    out.writerow([opts.predict, tract, R, R_b, Dopt, Sopt, Xn, Yn, mytimer.elapsed])
+    out.writerow([opts.predict, tract, R, R_a, R_b, Dopt, Sopt, Xn, Yn, mytimer.elapsed])
     f.flush()
     print "%d %% done"%(i / n_tracts * 100)
 
