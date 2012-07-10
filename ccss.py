@@ -396,7 +396,7 @@ def spatial_search(input, stream_s, tracts_bestguess, X_ts_precalculated=None, Y
 
     return sorted(approx_best), best, time_series(X[X.tract.isin(approx_best)]), time_series(Y[Y.tract.isin(approx_best)],lag=Y_LAG), X_ts_precalculated, Y_ts_precalculated, X_tssq_precalculated, Y_tssq_precalculated 
 
-def greedy_search(data, streams=streams):
+def greedy_search(data, streams=streams, daterange=daterange):
     tracts= unique(data['tract'])
     Dopt = np.array([])
     Sopt = np.array([])
@@ -416,7 +416,7 @@ def greedy_search(data, streams=streams):
             finished = 0
             i += 1
           
-            cor, S = greedy_locations(data, best_D)
+            cor, S = greedy_locations(data, best_D,daterange)
 
             if cor > best_cor:
                 best_S = S
@@ -425,7 +425,7 @@ def greedy_search(data, streams=streams):
                 finished = 1
 
             region = data[match_tracts(data,best_S)] 
-            cor, D = greedy_streams(region,np.array(streams))
+            cor, D = greedy_streams(region,np.array(streams),daterange)
 
             if cor > best_cor:
                 best_D = D
@@ -442,16 +442,16 @@ def greedy_search(data, streams=streams):
 
     return beta, list(Sopt), list(Dopt), (total_iters + 0.0) / opts.restarts
 
-def greedy_streams(region,streams=streams):
+def greedy_streams(region,streams=streams,daterange=daterange):
     # calculate dependent variable in this region
-    Y = time_series(region[region['type'] == opts.predict],lag=Y_LAG) 
+    Y = time_series(region[region['type'] == opts.predict],lag=Y_LAG,daterange=daterange) 
     
     X_ts = {}
     n_streams = len(streams)
 
     for i in range(n_streams):
         try:
-            X_ts[i] = time_series(region[region['type'] == streams[i]])
+            X_ts[i] = time_series(region[region['type'] == streams[i]],daterange=daterange)
         except:
             X_ts[i] = Y * 0
 
@@ -484,11 +484,11 @@ def greedy_streams(region,streams=streams):
 #                monotonic = False
             last_best = ii
 
-    rtest = time_series(region[match_streams(region,streams[Dopt])]).corr(Y)
+#    rtest = time_series(region[match_streams(region,streams[Dopt])]).corr(Y)
 #    assert((ropt - rtest) < .00001)
     return ropt, list(streams[Dopt])
 
-def greedy_locations(region,streams):
+def greedy_locations(region,streams,daterange=daterange):
     tracts = unique(region['tract'])
     n_tracts = len(tracts)
 
@@ -499,8 +499,8 @@ def greedy_locations(region,streams):
     Y_ts = {}
 
     for i in range(n_tracts):
-        X_ts[i] = time_series(Xdata[Xdata['tract'] == tracts[i]])
-        Y_ts[i] = time_series(Ydata[Ydata['tract'] == tracts[i]],lag=Y_LAG)
+        X_ts[i] = time_series(Xdata[Xdata['tract'] == tracts[i]], daterange=daterange)
+        Y_ts[i] = time_series(Ydata[Ydata['tract'] == tracts[i]],lag=Y_LAG, daterange=daterange)
 
     S = []
     Sopt = []
@@ -526,6 +526,6 @@ def greedy_locations(region,streams):
             ropt = rstar
             Sopt = list(S)
 
-    rtest = time_series(Xdata[match_tracts(Xdata,tracts[Sopt])]).corr(time_series(Ydata[match_tracts(Ydata,tracts[Sopt])],lag=Y_LAG))
+#    rtest = time_series(Xdata[match_tracts(Xdata,tracts[Sopt])]).corr(time_series(Ydata[match_tracts(Ydata,tracts[Sopt])],lag=Y_LAG))
     #assert((ropt - rtest) < .00001)
     return ropt, list(tracts[Sopt])
