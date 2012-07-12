@@ -14,11 +14,14 @@ print "completed in %d seconds"%mytimer.elapsed
 
 f = open(opts.output,"w")
 out = csv.writer(f)
-out.writerow("predict tract R R_a R_b Dopt Sopt Xn Yn elapsed".split())
+out.writerow("predict tract R R_a R_b Dopt Sopt Xn Yn n_tracts elapsed".split())
 
 n_tracts = len(np.unique(input['tract'])) * 1.0
 for i, tract in enumerate(np.unique(input['tract'])):
-    data = input[match_tracts(input, nearby_tracts(tract_centers[tract],input,RADIUS))]
+    
+    matched_tracts = nearby_tracts(tract_centers[tract],input,RADIUS)
+    data = input[match_tracts(input, matched_tracts)]
+           
     with mytimer:
         R_a, Sopt, Dopt, iters = search(data, np.array(streams), daterange=TIME_PERIOD_A)
 
@@ -41,7 +44,7 @@ for i, tract in enumerate(np.unique(input['tract'])):
     print "for predicting", opts.predict, "with these leading indicators:", ', '.join(Dopt)
     print "# of events in X:", Xn
     print "# of events in Y:", Yn
-    out.writerow([opts.predict, tract, R, R_a, R_b, Dopt, Sopt, Xn, Yn, mytimer.elapsed])
+    out.writerow([opts.predict, tract, R, R_a, R_b, Dopt, Sopt, Xn, Yn, len(matched_tracts), mytimer.elapsed])
     f.flush()
     print "%d %% done"%(i / n_tracts * 100)
 
