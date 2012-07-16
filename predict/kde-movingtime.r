@@ -105,15 +105,18 @@ if(DEBUG) {
 
 training.data = subset(merged, merged$date %in% training.dates)
 test.data = subset(merged, !(merged$date %in% training.dates))
-fit = glm(on ~ fhat, data=training.data, family=binomial(link="logit")) 
+fit = glm(on ~ fhat + factor(beat), data=training.data, family=binomial(link="logit")) 
+fit.lmer = lmer(on ~ fhat + (1|as.factor(training.data$beat)), data=training.data, family=binomial)
 
 predictions = predict.glm(fit, test.data, type="response")
+predictions.lmer = predict(fit, test.data, type="response")
 
 pred = prediction(predictions, test.data$on)
 perf = performance(pred,"tpr","fpr")
 auc = performance(pred,"auc")
+print(round(auc@y.values[[1]],4))
 
-pdf("kde-withtime-datefixed.pdf")
+pdf("kde-withtime-fixedeffects.pdf")
 plot(perf, xlim=c(0,.15), ylim=c(0,.5), main=paste("KDE with a time component, AUC=", round(auc@y.values[[1]],4)))
 
 lines(c(0,1),c(0,1),col=2)
