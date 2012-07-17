@@ -1,4 +1,3 @@
-import sqlite3 as sql
 import csv
 from pandas import *
 import utils
@@ -12,51 +11,44 @@ import csv
 THETA_THRESH = 2
 C_THRESH = 5
 AREAL = "beat"
-
+start_date = datetime.date(2011, 1, 1) #min(vc.date)
+end_date = datetime.date(2012, 4, 30) #max(vc.date)
 outf = "out.csv"
+
 if __name__  == "__main__":
     op = OptionParser()
     op.add_option("--theta",dest="theta",help="threshold for theta (default is 2)", default=2, type=float)
     op.add_option("-c", dest="c",help="threshold for counts c (default is 5)", default=5, type=float)
     op.add_option("--areal", dest="areal",help="areal unit to use (default is beat)", default="beat")
     op.add_option("--output", dest="output",help="output file use (default is out.csv)", default="out.csv")
-    op.add_option("--stream", dest="stream",help="stream type to predict (default is VIOLENT)", default="stream")
+    op.add_option("--input", dest="input",help="input file (default is geocoded.csv)", default="geocoded.csv")
+    op.add_option("--stream", dest="stream",help="stream type to predict (default is VIOLENT)", default="VIOLENT")
+    op.add_option("--start", dest="start",help="start date, use format YYYY-MM-DD (default is 2011-01-01)",default="2011-01-01")
+    op.add_option("--stop", dest="end",help="stop date, use format YYYY-MM-DD (default is 2012-03-31)",default="2012-03-31")
+
     opts = op.parse_args()[0]
 
     outf = opts.output
     THETA_THRESH = opts.theta
     C_THRESH = opts.c
     AREAL = opts.areal
+    start_date = parser.parse(opts.start).date()
+    end_date = parser.parse(opts.end).date()
 
-db = utils.load("input.db")
+vc = csv.reader(open(opts.input,"r"))
+cols = vc.next()
 
-# get a list of areal units
-areals = utils.query(db,"SELECT DISTINCT %s FROM data"%AREAL)
-if u'NA' in areals:
-    areals.remove(u'NA')
-
-n_areals = len(areals)
-print "Number of areal units:", n_areals
-
-#dates = utils.query(db,"SELECT DISTINCT date FROM data WHERE date between '2011-01-01' and '2012-06-30'")
-#dates = [parser.parse(d).date() for d in dates]
-
-#vc = read_csv("violent-by-beat.csv",converters={'date':lambda d: parser.parse(d).date()})
-#vc = read_csv("geocoded.csv",converters={'date':lambda d: parser.parse(d).date()}, names=("date","beat","type"))
-vc = csv.reader(open("geocoded.csv","r"))
-vc.next()
-
-# get a list of dates
-start_date = datetime.date(2011, 1, 1) #min(vc.date)
-end_date = datetime.date(2012, 4, 30) #max(vc.date)
-print "Date range:", start_date, "-", end_date
+date_i = cols.index('date')
+stream_i = cols.index('type')
+areal_i = cols.index(AREAL)
 
 n_dates = (end_date - start_date).days + 1
 Braw = {}
 Craw = {}
 Coverall = np.zeros(n_dates)
 
-for date,stream,X,Y,beat,tract,area in vc:
+for row in vc:
+    date, stream, beat = row[date_i], row[stream_i], row[areal_i]
     date = parser.parse(date).date()
     
     if date <= end_date and date >= start_date and beat != 'NA' and stream == opts.stream:

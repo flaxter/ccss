@@ -1,0 +1,31 @@
+Example 1:
+
+Let's look for anomalies using the following method: in each tract (or beat, or
+block) use counts from the last week to establish a baseline (expected) number. 
+Compare this baseline to the true value. Flag tracts as "on" if the 
+true value is far from the baseline (measure far by transforming to z-scores).
+Do this for each day from January 1st - March 31st.
+
+python gold_standard.py --input ../input/311-calls-January2011-March2012-blocks.csv --output rats1.csv --stream "Rodent Baiting/Rat Complaint" --areal tract
+
+I can share some code snippets to draw maps of the results in rats1.csv, or
+you can load it in ArcMap.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Example 2:
+
+Let's look for anomalies using CityScan, which identifies anomalous clusters
+of events. You can check README.CityScan for more information. This has
+two steps, first we need to create the input file for a specific date 
+(in this case April 30th, 2012) on which we want to detect anomalies:
+
+python cityscan.py --input ../input/dataset003.csv --output rodents_cs.csv --stream "Rodent Baiting/Rat Complaint" --date 2012-04-30 --areal tract
+
+and then we run it through cityscan:
+
+./cityscan in rodents_cs.csv out rodents_out.csv summary rodents_summary.csv 
+
+Now first check the summary file (and then compare it with rodents_out.csv).
+Again, ArcMap is probably a good choice for visualizing this data.
