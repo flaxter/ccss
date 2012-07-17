@@ -99,6 +99,6 @@ n_dates = (end_date - start_date).days + 1
 
 for beat in gold.keys():
     for i in range(n_dates):
-        out.writerow([int(beat), start_date + td(i), int(gold[beat][i])])
+        out.writerow([beat, start_date + td(i), gold[beat][i]])
 
 fo.flush()

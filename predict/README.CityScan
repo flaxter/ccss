@@ -1,0 +1,38 @@
+*** PLEASE DO NOT DISTRIBUTE THIS SOFTWARE WITHOUT PERMISSION ***
+
+DOCUMENTATION FOR CITYSCAN V0.1 (BETA)
+(c) 2009-2010, DANIEL B. NEILL
+
+Command line: ./cityscan in <filename> out [filename] summary [filename] areal_unit [default tract] max_radius [default 2500] num_baseline_days [default 28] summary_score_threshold [default 0.001] gisdir [default .]
+
+Example command line: ./cityscan in example_input_file.csv out example_output_file.csv summary example_summary_file.csv
+
+in: Input file name (required).  File must be in CSV format, containing fields current, tract, and type.  (If areal_unit is specified on the command line, will look for this attribute instead of tract.)
+
+out: Output file name.  File will be created in CSV format, containing fields tract, type, actual, expected, and score.  
+Actual and expected represent the actual and expected counts for that combination of location and type.
+Score represents the score of the highest-scoring non-overlapping region in which that location is contained.
+We assume separate runs of the expectation-based Poisson scan statistic, with circular search regions and a maximum temporal window of 1, for each type.  
+If areal_unit is specified on the command line, will create this attribute instead of tract.  If not specified, no output file will be created.
+Note that this file contains one record for each combination of location and type, and is sorted by location (primary) and type (secondary).
+
+summary: Summary output file name.  File will be created in CSV format, containing fields tract, type, actual, expected, and score.
+If areal_unit is specified on the command line, will create this attribute instead of tract.  If not specified, no summary output file will be created.
+Note that this file contains records only for those combinations of location and type with score above the summary_score_threshold, and is sorted from highest to lowest score.
+
+areal_unit: whether the given spatial locations represent tracts, blocks, etc.  Default value is tract; modifying this parameter will change the coordinate file that is read in, as well as the attribute names for the input and output files.
+
+gisdir: the directory containing the file, [areal_unit]_to_coords.csv.  Defaults to the current directory.
+
+max_radius: the maximum cluster radius to consider.  Default value is 2,500 feet.
+
+num_baseline_days: each case with current = 0 increases the expected count in a location by 1/num_baseline_days.  (Each case with current = 1 increases the actual count in a location by 1.)
+
+summary_score_threshold: as noted above, only combinations of location and type with score above summary_score threshold are included in the summary output file.  Default value is 0.001.
+
+Any questions?  Contact:
+
+Daniel B. Neill, Ph.D.
+Assistant Professor of Information Systems
+Carnegie Mellon University
+neill@cs.cmu.edu
