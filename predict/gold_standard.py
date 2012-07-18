@@ -92,7 +92,7 @@ print "Total number of areal units that are on over time", n_on_tot
 
 fo = open(outf,"w")
 out = csv.writer(fo)
-out.writerow([AREAL, 'date', 'on'])
+out.writerow(['areal', 'date', 'on'])
 
 start_date = start_date + td(6)
 n_dates = (end_date - start_date).days + 1
