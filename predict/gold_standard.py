@@ -1,6 +1,5 @@
 import csv
 from pandas import *
-import utils
 from dateutil import parser
 from datetime import timedelta as td
 import datetime
