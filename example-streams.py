@@ -12,16 +12,18 @@ out.writerow("predict R Dopt S Xn Yn elapsed".split())
 
 matched = "all"
 
+fields = 'type, tract, area, date'
+
 if opts.areas != "all":
     print "Matching areas", opts.areas
-    data = select(input, areas=opts.areas) #input[match_areas(input, opts.areas)]
+    data = select(input, areas=opts.areas, fields=fields, start_date=start_date, end_date=end_date) #input[match_areas(input, opts.areas)]
     matched = opts.areas
 elif opts.tracts != "all":
     print "Matching tracts", opts.tracts
-    data = select(input, tracts=opts.tracts) #input[match_tracts(input, opts.tracts)]
+    data = select(input, tracts=opts.tracts, fields=fields, start_date=start_date, end_date=end_date) #input[match_tracts(input, opts.tracts)]
     matched = opts.tracts
 else:
-    data = input
+    data = select(input, fields, start_date=start_date, end_date=end_date) #, input
 
 with mytimer:
     R, Dopt = search_streams(data, np.array(streams))

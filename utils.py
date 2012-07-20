@@ -307,8 +307,13 @@ def select(db, areas="all", tracts="all", streams="all", start_date=None, end_da
     if fields == "COUNT()":
         return rows[0][0]
 
+
     col_name_list = [c[0] for c in cur.description]
+    df = DataFrame(rows, columns=col_name_list)
 
-    return DataFrame(rows, columns=col_name_list) #"date type x y block beat tract area".split())
+    try:
+        df.date = df.date.apply(lambda s: p.parse(s).date())
+    except AttributeError:
+        pass
 
-
+    return df

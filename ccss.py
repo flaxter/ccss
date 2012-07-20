@@ -19,6 +19,7 @@ input = load_input(opts.input)
 # PARSE ARGUMENTS
 
 start_date, end_date = get_date_range(input)
+
 if opts.start_date != '':
     start_date = opts.start_date
 
