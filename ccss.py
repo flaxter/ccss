@@ -18,16 +18,11 @@ input = load_input(opts.input)
 
 # PARSE ARGUMENTS
 
-dates = unique(input['date'])
-
-if opts.start_date == '':
-    start_date = dates[0]
-else:
+start_date, end_date = get_date_range(input)
+if opts.start_date != '':
     start_date = opts.start_date
 
-if opts.end_date == '':
-    end_date = dates[-1]
-else:
+if opts.end_date != '':
     end_date = opts.end_date
 
 period = (end_date - start_date).days + 1
@@ -38,7 +33,7 @@ TIME_PERIOD_B = daterange[period/2:period]
 MAX_LAG = opts.lag
 Y_LAG = opts.lag
 
-streams = unique(input['type'])
+streams = get_streams(input) #unique(input['type'])
 #areas = unique(input['area'])
 print "Time period:", start_date, "-", end_date
 

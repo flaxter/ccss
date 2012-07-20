@@ -2,6 +2,10 @@ import csv
 import pylab as pl
 import dateutil
 import cPickle as pickle
+import sqlite3 as sql
+
+from dateutil import parser as p
+
 import numpy as np
 import logging
 from pandas import *
@@ -25,6 +29,28 @@ def crosscorr(x,y,lag,max_lag=10):
     assert(len(x) == len(y))
     return pl.dot(x,y) / (pl.norm(x) * pl.norm(y))
 
+def query(db,q,cols=None):
+    cur = db.cursor()
+    result = cur.execute(q)
+    rows = result.fetchall()
+    if len(rows) == 0:
+        return None
+    elif len(rows[0]) == 1:
+        return list(zip(*rows)[0])
+    else: 
+        return rows
+
+def get_date_range(db):
+    r = query(db, "SELECT MIN(date) , MAX(date) FROM data")[0]
+    start = r[0]
+    start = p.parse(start).date()
+    end = r[1]
+    end = p.parse(end).date()
+    return start, end
+
+def get_streams(db):
+    return np.array(query(db, "SELECT DISTINCT type FROM data"))
+    
 def subset_data(data, x1, y1, x2, y2,area=-1):
     if area > 0:
         return (data['xcoordinate'] >= x1) * (data['xcoordinate'] <= x2) * (data['ycoordinate'] >= y1) * (data['xcoordinate'] <= y2) * (data['area'] == area)
@@ -107,7 +133,7 @@ def sqnorm(x):
 def parse_args():
     from optparse import OptionParser
     parser = OptionParser()
-    parser.add_option("-i", "--input", dest="input", help="name of input file in .csv format", default="input/sample.csv")
+    parser.add_option("-i", "--input", dest="input", help="name of input file in .csv format", default="input/dataset004.db")
     parser.add_option("-o", "--output", dest="output", help="name of output file", default="results/default-output.csv")
     parser.add_option("--output_prefix", dest="output_prefix", help="name of output prefix", default="")
     parser.add_option("-s", "--streams", dest="streams", help="independent variable stream (use 'all' to try all subsets)", default="all")
@@ -161,6 +187,9 @@ class TooSparse(Exception):
         return repr(self.value)
 
 def load_input(filename):
+    if filename.split('.')[-1] == "db":  # load sql database
+        return sql.connect(filename)
+
     f = filename + ".p"
     try:
         logging.debug("Trying to load %s"%f)
@@ -247,3 +276,39 @@ def calculate_tract_centers(input=0):
    #     tract_centers[t] = (lat,long)
 #
 #    return tract_centers
+
+def select(db, areas="all", tracts="all", streams="all", start_date=None, end_date=None, fields="*"):
+    """ To select a date range, start_date and end_date must both be non-None, and they must be strings formatted YYYY-MM-DD """
+    cur = db.cursor()
+    #db.row_factory = sql.Row
+
+    where = "1"
+    if areas != "all":
+        areas = [str(a) for a in areas]
+        where = " AND ".join([where,'area in (%s)'%(','.join(areas))])
+    if tracts != "all":
+        tracts = [str(t) for t in tracts]
+        where = " AND ".join([where,'tract in (%s)'%(','.join(tracts))])
+    if streams != "all":
+        streams = ["'%s'"%s for s in streams]
+        where = " AND ".join([where,'type in (%s)'%(','.join(streams))])
+    if start_date != None and end_date != None: # currently you need them both
+        where = "%s AND date between '%s' and '%s'"%(where,start_date,end_date)
+
+    #print "SELECT %s from data where %s"%(fields,where)
+    query = 'SELECT %s FROM data WHERE %s'%(fields, where)
+    print query
+    result = cur.execute(query)
+
+    rows = result.fetchall()
+    if len(rows) == 0:
+        rows = None
+
+    if fields == "COUNT()":
+        return rows[0][0]
+
+    col_name_list = [c[0] for c in cur.description]
+
+    return DataFrame(rows, columns=col_name_list) #"date type x y block beat tract area".split())
+
+

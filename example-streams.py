@@ -14,11 +14,11 @@ matched = "all"
 
 if opts.areas != "all":
     print "Matching areas", opts.areas
-    data = input[match_areas(input, opts.areas)]
+    data = select(input, areas=opts.areas) #input[match_areas(input, opts.areas)]
     matched = opts.areas
 elif opts.tracts != "all":
     print "Matching tracts", opts.tracts
-    data = input[match_tracts(input, opts.tracts)]
+    data = select(input, tracts=opts.tracts) #input[match_tracts(input, opts.tracts)]
     matched = opts.tracts
 else:
     data = input
