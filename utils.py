@@ -42,11 +42,20 @@ def query(db,q,cols=None):
 
 def get_date_range(db):
     r = query(db, "SELECT MIN(date) , MAX(date) FROM data")[0]
-    start = r[0]
-    start = p.parse(start).date()
-    end = r[1]
-    end = p.parse(end).date()
-    return start, end
+    print "trying to parse", r
+    try: 
+        start = r[0]
+        start = p.parse(start).date()
+        end = r[1]
+        end = p.parse(end).date()
+        return start, end
+    except:
+        start = r[0].strip('"')
+        print "exception start", start
+        start = p.parse(start).date()
+        end = r[1].strip('"')
+        end = p.parse(end).date()
+        return start, end
 
 def get_streams(db):
     return np.array(query(db, "SELECT DISTINCT type FROM data"))
