@@ -35,9 +35,8 @@ else:
         print "Correlation = %.05f"%R
         print "for predicting", opts.predict, "with these leading indicators:", ', '.join(Dopt)
         print "# of events in X:", Xn
-        data = input[match_areas(input, [matched])]
-    print "# of events in Y:", Yn
-    out.writerow([opts.predict, R, Dopt, matched, Xn, Yn, mytimer.elapsed])
+        print "# of events in Y:", Yn
+        out.writerow([opts.predict, R, Dopt, matched, Xn, Yn, mytimer.elapsed])
 
-    print "search complete, output written to %s"%(opts.output)
+        print "search complete, output written to %s"%(opts.output)
 
