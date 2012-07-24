@@ -319,10 +319,13 @@ def select(db, areas="all", tracts="all", streams="all", start_date=None, end_da
 
     col_name_list = [c[0] for c in cur.description]
     df = DataFrame(rows, columns=col_name_list)
+    print "# of rows = ", len(rows)
 
     try:
         df.date = df.date.apply(lambda s: p.parse(s).date())
+        print "successfully parsed dates"
     except AttributeError:
+        print "did not successfully parse dates"
         pass
 
     return df
