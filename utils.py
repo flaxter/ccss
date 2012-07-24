@@ -163,6 +163,7 @@ def parse_args():
     parser.add_option("--dpenalty", dest="dpenalty", default=0, type=float)
     parser.add_option("--process", dest="process")
     parser.add_option("--row", dest="row", type=int)
+    parser.add_option("--max_streams", dest="max_streams", type=int, default=-1)
 
     opts = parser.parse_args()[0]
     if opts.start_date != '':

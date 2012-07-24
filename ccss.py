@@ -438,7 +438,7 @@ def greedy_search(data, streams=streams, daterange=daterange):
 
     return beta, list(Sopt), list(Dopt), (total_iters + 0.0) / opts.restarts
 
-def greedy_streams(region,streams=streams,daterange=daterange):
+def greedy_streams(region,streams=streams,daterange=daterange, max_streams=opts.max_streams):
     # calculate dependent variable in this region
     Y = time_series(region[region['type'] == opts.predict],lag=Y_LAG,daterange=daterange) 
     
@@ -479,6 +479,9 @@ def greedy_streams(region,streams=streams,daterange=daterange):
 #            if last_best != (ii - 1) and last_best != -1:
 #                monotonic = False
             last_best = ii
+
+        if max_streams > 0 and len(Dopt) > max_streams:
+            break
 
 #    rtest = time_series(region[match_streams(region,streams[Dopt])]).corr(Y)
 #    assert((ropt - rtest) < .00001)
