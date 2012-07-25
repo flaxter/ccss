@@ -455,16 +455,12 @@ def greedy_streams(region,streams=streams,daterange=daterange, max_streams=opts.
     Dopt = []
     X = np.zeros(len(Y))
     ropt = 0
-    monotonic = True
-    last_best = -1
 
     for ii in range(n_streams):
         r = np.zeros(n_streams)
         for j in range(n_streams):
             if not j in D:
                 r[j] = Y.corr(X + X_ts[j]) 
-#                if ii == 0:
-                    #                    print "Y vs %s: %f"%(streams[j],r[j])
 
         r[np.isnan(r)] = 0
 
@@ -472,15 +468,12 @@ def greedy_streams(region,streams=streams,daterange=daterange, max_streams=opts.
         X += X_ts[max_i]
         D.append(max_i)
         rstar = np.max(r)
-#        print "%d: r = %f, ropt = %f (%s)"%(ii,rstar,ropt,str(monotonic))
         if rstar > ropt:
             ropt = rstar
             Dopt = list(D)
-#            if last_best != (ii - 1) and last_best != -1:
-#                monotonic = False
-            last_best = ii
+            print "%.04f (%d streams)"%(ropt, len(Dopt))
 
-        if max_streams > 0 and len(Dopt) > max_streams:
+        if max_streams > 0 and len(D) == max_streams:
             break
 
 #    rtest = time_series(region[match_streams(region,streams[Dopt])]).corr(Y)

@@ -59,6 +59,14 @@ def get_date_range(db):
 
 def get_streams(db):
     return np.array(query(db, "SELECT DISTINCT type FROM data"))
+
+def get_tracts(db):
+    t = query(db, "SELECT DISTINCT tract FROM data")
+    try:
+        t.remove('NA')
+    except:
+        pass
+    return np.array(t)
     
 def subset_data(data, x1, y1, x2, y2,area=-1):
     if area > 0:
