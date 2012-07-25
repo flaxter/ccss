@@ -32,12 +32,12 @@ else:
 
         Xn = np.sum(match_streams(data,Dopt))
         Yn = np.sum(match_streams(data,[opts.predict]))
-        print "\n\n-------------------- In area", matched
+        print "\n\n-------------------- In tract", tract
         print "Correlation = %.05f"%R
         print "for predicting", opts.predict, "with these leading indicators:", ', '.join(Dopt)
         print "# of events in X:", Xn
         print "# of events in Y:", Yn
-        out.writerow([opts.predict, R, Dopt, matched, Xn, Yn, mytimer.elapsed])
+        out.writerow([opts.predict, R, Dopt, tract, Xn, Yn, mytimer.elapsed])
 
         print "search complete, output written to %s"%(opts.output)
 
