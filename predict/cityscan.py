@@ -43,9 +43,16 @@ for row in vc:
     date = parser.parse(date).date()
     
     if date <= end_date and date >= start_date and beat != 'NA' and stream == opts.stream:
-        print "MATCHED! date", date, "beat", beat, "stream", stream
         out.writerow([int(date==end_date), beat, stream])
     else:
-        print "DID NOT MATCH: date", date, "beat", beat, "stream", stream
+        if date > end_date:
+            print "Date", date, "is after end_date", end_date,
+        if date < start_date:
+            print "Date", date, "is before start_date", start_date,
+        if beat == 'NA':
+            print "Beat", beat, "is NA",
+        if stream != opts.stream:
+            print "Stream", beat, "!=", opts.stream,
+        print
 
 fo.flush()
