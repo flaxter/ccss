@@ -41,6 +41,9 @@ out.writerow(['current',AREAL,'type'])
 for row in vc:
     date, stream, beat = row[date_i], row[stream_i], row[areal_i]
     date = parser.parse(date).date()
+    print "date", date
+    print "beat", beat
+    print "stream", stream
     
     if date <= end_date and date >= start_date and beat != 'NA' and stream == opts.stream:
         out.writerow([int(date==end_date), beat, stream])
