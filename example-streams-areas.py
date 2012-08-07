@@ -9,6 +9,7 @@ from ccss import greedy_streams as search_streams
 f = open(opts.output,"w")
 out = csv.writer(f)
 out.writerow("predict R Dopt S Xn Yn elapsed".split())
+out.writerow("predict R R_a R_b Dopt S Xn Yn elapsed".split())
 
 matched = "all"
 
@@ -27,16 +28,28 @@ else:
         data = select(input, areas=[matched], fields=fields, start_date=start_date, end_date=end_date) #, input
 
         with mytimer:
-            R, Dopt = search_streams(data, np.array(streams))
+            R_a, Dopt = search_streams(data, np.array(streams), daterange=TIME_PERIOD_A)
 
-        Xn = np.sum(match_streams(data,Dopt))
-        Yn = np.sum(match_streams(data,[opts.predict]))
+
+        X = match_streams(data,Dopt)
+        Y = match_streams(data,[opts.predict]) 
+        Xn = np.sum(X)
+        Yn = np.sum(Y)
+        X_ts = time_series(data[X], daterange=TIME_PERIOD_B)
+        Y_ts = time_series(data[Y],lag=Y_LAG, daterange=TIME_PERIOD_B)
+        R_b = X_ts.corr(Y_ts)
+        X_ts = time_series(data[X], daterange=daterange)
+        Y_ts = time_series(data[Y],lag=Y_LAG, daterange=daterange)
+        R = X_ts.corr(Y_ts)
         print "\n\n-------------------- In area", matched
         print "Correlation = %.05f"%R
         print "for predicting", opts.predict, "with these leading indicators:", ', '.join(Dopt)
         print "# of events in X:", Xn
         print "# of events in Y:", Yn
-        out.writerow([opts.predict, R, Dopt, matched, Xn, Yn, mytimer.elapsed])
+
+        if R_a > opts.thresh and R_b > opts.thresh and R > opts.thresh: 
+            print "Found a significant one, writing it to csv"
+            out.writerow([opts.predict, R, R_a, R_b, Dopt, matched, Xn, Yn, mytimer.elapsed])
 
         print "search complete, output written to %s"%(opts.output)
 

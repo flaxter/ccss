@@ -167,19 +167,29 @@ def parse_args():
     parser.add_option("--aggregate", dest="aggregate", help="for exhaustive search only, calculate F(S|D) (use --aggregate D) or F(D|S) (use --aggregate S)", default='')
     parser.add_option("--startdate", dest="start_date", help="MM/DD/YYYY", default='')
     parser.add_option("--enddate", dest="end_date", help="MM/DD/YYYY", default='')
+
+    parser.add_option("--startdatetrain", dest="start_date_train", help="MM/DD/YYYY", default='')
+    parser.add_option("--enddatetrain", dest="end_date_train", help="MM/DD/YYYY", default='')
+    parser.add_option("--startdatetest", dest="start_date_test", help="MM/DD/YYYY", default='')
+    parser.add_option("--enddatetest", dest="end_date_test", help="MM/DD/YYYY", default='')
+
     parser.add_option("--lag", dest="lag", default=7, type=int)
     parser.add_option("--dpenalty", dest="dpenalty", default=0, type=float)
     parser.add_option("--process", dest="process")
     parser.add_option("--row", dest="row", type=int)
     parser.add_option("--max_streams", dest="max_streams", type=int, default=-1)
+    parser.add_option("--thresh", dest="thresh", type=float, default=0)
 
     opts = parser.parse_args()[0]
-    if opts.start_date != '':
-        from dateutil import parser as p
-        opts.start_date = p.parse(opts.start_date).date()
-    if opts.end_date != '':
-        from dateutil import parser as p
-        opts.end_date = p.parse(opts.end_date).date()
+    from dateutil import parser as p
+    def pd(d):
+        if d != '':
+            return p.parse(d).date()
+        else:
+            return d
+    opts.start_date, opts.end_date, opts.start_date_train, opts.end_date_train, opts.start_date_test, opts.end_date_test = \
+        pd(opts.start_date), pd(opts.end_date), pd(opts.start_date_train), pd(opts.end_date_train), pd(opts.start_date_test), pd(opts.end_date_test)
+
     if opts.areas != "all":
 	if "," in opts.areas:
             opts.areas = [float(s) for s in opts.areas.strip().strip('[]').split(',')]
@@ -332,9 +342,7 @@ def select(db, areas="all", tracts="all", streams="all", start_date=None, end_da
 
     try:
         df.date = df.date.apply(lambda s: p.parse(s).date())
-        print "successfully parsed dates"
     except AttributeError:
-        print "did not successfully parse dates"
         pass
 
     return df

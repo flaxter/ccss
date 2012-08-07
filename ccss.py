@@ -26,10 +26,21 @@ if opts.start_date != '':
 if opts.end_date != '':
     end_date = opts.end_date
 
+if opts.start_date_test == '':
+    opts.start_date_test = start_date
+if opts.end_date_test == '':
+    opts.end_date_test = end_date
+if opts.start_date_train == '':
+    opts.start_date_train = start_date
+if opts.end_date_train == '':
+    opts.end_date_train = end_date
+
 period = (end_date - start_date).days + 1
 daterange = [start_date+td(day) for day in range(period)] 
-TIME_PERIOD_A = daterange[0:period/2]
-TIME_PERIOD_B = daterange[period/2:period]
+
+tmp = np.array(daterange)
+TIME_PERIOD_A = tmp[(tmp > opts.start_date_train) & (tmp < opts.end_date_train)]
+TIME_PERIOD_B = tmp[(tmp > opts.start_date_test) & (tmp < opts.end_date_test)]
 
 MAX_LAG = opts.lag
 Y_LAG = opts.lag
