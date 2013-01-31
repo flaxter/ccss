@@ -5,8 +5,10 @@ python fetch.py 311.csv
 
 # geocode 311.csv
 
+# this produces the geocoded dataset, and counts of violent crime by beat
+# for use in the ../predict scripts
 python --no-save < geocode.r 
-#python geocode.py 311.csv > 311-geocoded.csv
+# update the next script so that the date range is correct
 #python postprocess.py 311-geocoded.csv > 311-census.csv
 
 R --no-save < long_to_wide.R
