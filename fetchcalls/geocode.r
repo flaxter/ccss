@@ -2,7 +2,7 @@ library(maptools)
 library(spdep)
 
 tracts = readShapePoly("shp/CensusTractsTIGER2010.shp")
-tracts2000 = readShapePoly("../../../PHDCN/shp/Census_Tracts.shp")
+#tracts2000 = readShapePoly("../../../PHDCN/shp/Census_Tracts.shp")
 beats = readShapePoly("shp/cpd_beats.shp")
 areas = readShapePoly("shp/CommAreas.shp")
 #blocks = readShapePoly("shp/Census Blocks.shp")
@@ -15,7 +15,7 @@ areas = readShapePoly("shp/CommAreas.shp")
 #par(new=TRUE)
 #plot(blocks, border="red", axes=FALSE, las=1)
 
-f = read.csv("crime-311-January2011-June2012-coords-nodup.csv")
+f = read.csv("311.csv")
 
 data = f[complete.cases(f),]
 
