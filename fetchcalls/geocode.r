@@ -1,5 +1,6 @@
 library(maptools)
-library(spdep)
+library(sp)
+#library(spdep)
 
 tracts = readShapePoly("shp/CensusTractsTIGER2010.shp")
 #tracts2000 = readShapePoly("../../../PHDCN/shp/Census_Tracts.shp")
@@ -15,9 +16,9 @@ areas = readShapePoly("shp/CommAreas.shp")
 #par(new=TRUE)
 #plot(blocks, border="red", axes=FALSE, las=1)
 
-f = read.csv("311.csv")
+data = read.csv("311.csv", stringsAsFactors = FALSE)
 
-data = f[complete.cases(f),]
+data = data[complete.cases(data),]
 
 ss = data$type
 counts = aggregate(ss, list(ss), FUN=length)
@@ -30,9 +31,8 @@ data$type[data$type == "INTERFERE WITH PUBLIC OFFICER"] = "INTERFERENCE WITH PUB
 #data$type = factor(data$type, levels = c(levels(data$type), "VIOLENT", "Lights", "Rodent", "Garbage"))
 #data$type[data$type %in% violent] = "VIOLENT"
 
-data$type[data$type == "Street Lights - All/Out"] = "Lights"
-data$type[data$type == "Rodent Baiting/Rat Complaint"] = "Rodent"
-data$type[data$type == "Garbage Cart Black Maintenance/Replacement"] = "Garbage"
+#data$type[data$type == "Rodent Baiting/Rat Complaint"] = "Rodent"
+#data$type[data$type == "Garbage Cart Black Maintenance/Replacement"] = "Garbage"
 
 latlong = data[,c(3,4)]
 
