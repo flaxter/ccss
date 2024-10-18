@@ -89,6 +89,20 @@ python example-locations.py --predict vacant
 
 This one will take a long time to run; while it's running you can check
 the results by opening another terminal and looking at results/vacant.csv 
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                            And some more examples of syntax
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+python example-streams.py --tracts "[8430.0, 8431.0, 8432.0, 8433.0, 8434.0, 8435.0, 8436.0, 8437.0, 8438.0]"
+python example-streams.py "pot hole in street" --area "[6]"
+
+python example-locations.py --area "[34,35]" 
+python example-locations.py --predict vacant
+
+This one will take a long time to run; while it's running you can check
+the results by opening another terminal and looking at results/vacant.csv 
 (the -u option for python tells it to write results right away without 
 waiting until the program exits.)
 
